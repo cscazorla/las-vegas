@@ -8,7 +8,10 @@ export class World {
   private entities = new Map<number, Entity>();
   private nextId = 1;
 
-  constructor(private scene: THREE.Scene, private debug = false) {
+  constructor(
+    private scene: THREE.Scene,
+    private debug = false,
+  ) {
     this.grid = new Grid({ width: 10, depth: 10, cellSize: 1 });
 
     if (this.debug) {
@@ -32,9 +35,7 @@ export class World {
   }
 
   getCabinets(): Cabinet[] {
-    return [...this.entities.values()].filter(
-      (e): e is Cabinet => e.type === 'cabinet',
-    );
+    return [...this.entities.values()].filter((e): e is Cabinet => e.type === 'cabinet');
   }
 
   getEntity(id: number): Entity | undefined {

@@ -20,6 +20,7 @@
 - Chips (US) / Crisps (UK): Bagged potato chips.
 - Vending Machine: Automated snack dispensers.
 - Candy: Sweets and treats.
+
 # Links
 
 - https://kenney.nl/assets/mini-arcade

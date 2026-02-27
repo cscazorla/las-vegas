@@ -30,26 +30,39 @@ Monorepo scaffolded with game loop, Three.js rendering, and entity tracking work
 
 Project docs mix Spanish and English. Key terms:
 
-| Spanish | English | Notes |
-|---------|---------|-------|
-| Salón | Video Arcade / Amusement Alley | The venue the player manages |
-| Máquinas arcades | Arcade Cabinets ("Cabs") | 2-player cabinet if multiplayer |
-| Floor Plan (Distribución) | Layout | Optimize for foot traffic |
-| Fuera de servicio | Out of Order | Machine health drops below 30% |
-| Recaudación | Coin Drop / Revenue | Money accumulated inside machines |
-| Mantenimiento | Upkeep / Servicing | Repairing CRTs or controls |
-| Monedero / Ranura | Coin Slot | Where players insert money |
+| Spanish                   | English                        | Notes                             |
+| ------------------------- | ------------------------------ | --------------------------------- |
+| Salón                     | Video Arcade / Amusement Alley | The venue the player manages      |
+| Máquinas arcades          | Arcade Cabinets ("Cabs")       | 2-player cabinet if multiplayer   |
+| Floor Plan (Distribución) | Layout                         | Optimize for foot traffic         |
+| Fuera de servicio         | Out of Order                   | Machine health drops below 30%    |
+| Recaudación               | Coin Drop / Revenue            | Money accumulated inside machines |
+| Mantenimiento             | Upkeep / Servicing             | Repairing CRTs or controls        |
+| Monedero / Ranura         | Coin Slot                      | Where players insert money        |
 
 ## Build & Development Commands
 
 All commands run from the repo root:
 
-| Command | Description |
-|---------|-------------|
-| `npm install` | Install all workspace dependencies |
-| `npm run dev` | Start Vite dev server with HMR (opens browser) |
-| `npm run build` | Type-check + production build → `packages/game/dist/` |
-| `npm run preview` | Preview production build locally |
+| Command                | Description                                           |
+| ---------------------- | ----------------------------------------------------- |
+| `npm install`          | Install all workspace dependencies                    |
+| `npm run dev`          | Start Vite dev server with HMR (opens browser)        |
+| `npm run build`        | Type-check + production build → `packages/game/dist/` |
+| `npm run preview`      | Preview production build locally                      |
+| `npm run lint`         | Run ESLint on all files                               |
+| `npm run lint:fix`     | Run ESLint with auto-fix                              |
+| `npm run format`       | Format all files with Prettier                        |
+| `npm run format:check` | Check formatting without writing                      |
+
+## Linting & Formatting
+
+- **ESLint 9** with flat config (`eslint.config.js` at repo root, ESM)
+- **typescript-eslint** `recommendedTypeChecked` — type-aware rules using `projectService: true`
+- **eslint-config-prettier** disables formatting-related ESLint rules (must be last in config)
+- **Prettier** for code formatting (`.prettierrc` at repo root)
+- Underscore-prefixed unused vars are allowed (e.g. `_delta`)
+- `.js`/`.mjs` config files have type-checked rules disabled
 
 ## Debug Mode
 

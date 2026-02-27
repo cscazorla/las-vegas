@@ -19,12 +19,7 @@ export class SceneManager {
     this.scene.background = new THREE.Color(0x000000);
 
     // Camera — 3/4 overhead view
-    this.camera = new THREE.PerspectiveCamera(
-      60,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      100,
-    );
+    this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
     this.camera.position.set(8, 10, 8);
     this.camera.lookAt(0, 0, 0);
 
@@ -96,12 +91,12 @@ export class SceneManager {
 
     this.scene.traverse((object) => {
       if (object instanceof THREE.Mesh) {
-        object.geometry.dispose();
-        if (Array.isArray(object.material)) {
-          object.material.forEach((m) => m.dispose());
-        } else {
-          object.material.dispose();
-        }
+        const mesh = object as THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>;
+        mesh.geometry.dispose();
+        const materials: THREE.Material[] = Array.isArray(mesh.material)
+          ? mesh.material
+          : [mesh.material];
+        materials.forEach((m) => m.dispose());
       }
     });
   }

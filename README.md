@@ -9,6 +9,7 @@ Manage your own video arcade: purchase arcade cabinets, place them on a floor pl
 - TypeScript
 - Three.js
 - Vite
+- ESLint 9 + Prettier
 - npm workspaces monorepo
 
 ## Getting Started
@@ -25,6 +26,10 @@ npm run build
 
 # Preview production build
 npm run preview
+
+# Lint and format
+npm run lint
+npm run format
 ```
 
 ## Environment Variables
@@ -35,9 +40,9 @@ Copy the example env file and adjust as needed:
 cp packages/game/.env.example packages/game/.env.local
 ```
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `VITE_DEBUG` | `true` | Enable debug mode (axes helper, etc.). Set to `false` to disable. |
+| Variable     | Default | Description                                                       |
+| ------------ | ------- | ----------------------------------------------------------------- |
+| `VITE_DEBUG` | `true`  | Enable debug mode (axes helper, etc.). Set to `false` to disable. |
 
 `.env.local` is gitignored. You can also override inline: `VITE_DEBUG=false npm run dev`
 

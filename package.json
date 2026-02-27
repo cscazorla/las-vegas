@@ -1,12 +1,26 @@
 {
   "private": true,
-  "workspaces": ["packages/*"],
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "npm run dev -w @las-vegas/game",
     "build": "npm run build -w @las-vegas/game",
-    "preview": "npm run preview -w @las-vegas/game"
+    "preview": "npm run preview -w @las-vegas/game",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "engines": {
     "node": ">=20.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.3",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^15.15.0",
+    "prettier": "^3.8.1",
+    "typescript-eslint": "^8.56.1"
   }
 }

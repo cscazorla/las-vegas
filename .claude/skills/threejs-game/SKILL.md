@@ -10,6 +10,7 @@ Comprehensive assistance with Three.js game development using WebGL, covering 3D
 ## When to Use This Skill
 
 Activate this skill when:
+
 - Building 3D web games with Three.js
 - Implementing game mechanics (player movement, collisions, scoring)
 - Setting up cameras, lighting, and scene management
@@ -93,8 +94,8 @@ class InputManager {
     this.keys = {};
     this.mouse = { x: 0, y: 0, buttons: {} };
 
-    window.addEventListener('keydown', (e) => this.keys[e.code] = true);
-    window.addEventListener('keyup', (e) => this.keys[e.code] = false);
+    window.addEventListener('keydown', (e) => (this.keys[e.code] = true));
+    window.addEventListener('keyup', (e) => (this.keys[e.code] = false));
     window.addEventListener('mousemove', (e) => {
       this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
       this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -110,7 +111,7 @@ class InputManager {
       jump: this.keys['Space'],
       action: this.keys['KeyE'],
       rotateLeft: this.keys['KeyQ'],
-      rotateRight: this.keys['KeyE']
+      rotateRight: this.keys['KeyE'],
     };
   }
 }
@@ -122,10 +123,10 @@ class InputManager {
 function checkCollisions(player, obstacles) {
   const raycaster = new THREE.Raycaster();
   const directions = [
-    new THREE.Vector3(1, 0, 0),   // right
-    new THREE.Vector3(-1, 0, 0),  // left
-    new THREE.Vector3(0, 0, 1),   // forward
-    new THREE.Vector3(0, 0, -1),  // backward
+    new THREE.Vector3(1, 0, 0), // right
+    new THREE.Vector3(-1, 0, 0), // left
+    new THREE.Vector3(0, 0, 1), // forward
+    new THREE.Vector3(0, 0, -1), // backward
   ];
 
   for (const direction of directions) {
@@ -137,7 +138,7 @@ function checkCollisions(player, obstacles) {
         collision: true,
         object: intersects[0].object,
         distance: intersects[0].distance,
-        point: intersects[0].point
+        point: intersects[0].point,
       };
     }
   }
@@ -165,16 +166,16 @@ function loadCharacter(path) {
         // Setup animations if available
         const mixer = new THREE.AnimationMixer(model);
         const animations = {};
-        gltf.animations.forEach(clip => {
+        gltf.animations.forEach((clip) => {
           animations[clip.name] = mixer.clipAction(clip);
         });
 
         resolve({ model, mixer, animations });
       },
       (progress) => {
-        console.log(`Loading: ${(progress.loaded / progress.total * 100).toFixed(2)}%`);
+        console.log(`Loading: ${((progress.loaded / progress.total) * 100).toFixed(2)}%`);
       },
-      (error) => reject(error)
+      (error) => reject(error),
     );
   });
 }
@@ -283,27 +284,32 @@ class Entity {
 ## Key Concepts
 
 ### Scene Graph
+
 - Organize game objects hierarchically
 - Use groups for complex objects
 - Parent-child transformations
 
 ### Game Loop
+
 - Use `requestAnimationFrame` for 60fps
 - Calculate delta time for frame-independent movement
 - Separate update logic from rendering
 
 ### Camera Systems
+
 - **PerspectiveCamera**: First/third-person games
 - **OrthographicCamera**: 2D/isometric games
 - Implement camera follow and smooth transitions
 
 ### Lighting
+
 - **AmbientLight**: Base illumination
 - **DirectionalLight**: Sun/moonlight with shadows
 - **PointLight**: Torches, explosions
 - **SpotLight**: Flashlights, stage lights
 
 ### Performance Optimization
+
 - Use instancing for repeated objects
 - Implement frustum culling
 - Use LOD (Level of Detail) for distant objects
@@ -312,6 +318,7 @@ class Entity {
 - Enable shadow map optimization
 
 ### Asset Loading
+
 - Preload all assets before game start
 - Show loading progress bar
 - Use LoadingManager for coordination
@@ -328,7 +335,7 @@ class GameStateMachine {
       menu: new MenuState(),
       playing: new PlayingState(),
       paused: new PausedState(),
-      gameOver: new GameOverState()
+      gameOver: new GameOverState(),
     };
     this.currentState = this.states.menu;
   }
@@ -402,16 +409,19 @@ Detailed documentation organized by topic:
 ## Resources
 
 ### Official Documentation
+
 - Three.js Manual: https://threejs.org/manual/
 - Three.js API: https://threejs.org/docs/
 - Three.js Examples: https://threejs.org/examples/
 
 ### Physics Integration
+
 - **Cannon.js**: Lightweight 3D physics
 - **Ammo.js**: Full Bullet physics engine port
 - **Rapier**: High-performance physics
 
 ### Useful Libraries
+
 - **three-mesh-bvh**: Fast raycasting
 - **three-pathfinding**: Navigation meshes
 - **postprocessing**: Advanced effects
@@ -419,12 +429,14 @@ Detailed documentation organized by topic:
 ## Working with This Skill
 
 ### For Beginners
+
 1. Start with basic scene setup
 2. Learn the coordinate system
 3. Understand the game loop
 4. Practice with simple shapes before models
 
 ### For Game Development
+
 1. Plan your game architecture
 2. Implement input handling first
 3. Build a simple player controller
@@ -432,6 +444,7 @@ Detailed documentation organized by topic:
 5. Optimize performance throughout
 
 ### For Advanced Features
+
 1. Integrate physics engines
 2. Implement advanced shaders
 3. Add post-processing effects
