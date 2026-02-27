@@ -27,6 +27,20 @@ npm run build
 npm run preview
 ```
 
+## Environment Variables
+
+Copy the example env file and adjust as needed:
+
+```bash
+cp packages/game/.env.example packages/game/.env.local
+```
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `VITE_DEBUG` | `true` | Enable debug mode (axes helper, etc.). Set to `false` to disable. |
+
+`.env.local` is gitignored. You can also override inline: `VITE_DEBUG=false npm run dev`
+
 ## Project Structure
 
 ```

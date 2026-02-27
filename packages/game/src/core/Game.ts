@@ -1,14 +1,20 @@
 import * as THREE from 'three';
 import { SceneManager } from '@/rendering/SceneManager';
 
+export interface GameOptions {
+  debug?: boolean;
+}
+
 export class Game {
+  readonly debug: boolean;
   private clock: THREE.Clock;
   private sceneManager: SceneManager;
   private animationFrameId: number | null = null;
 
-  constructor() {
+  constructor({ debug = false }: GameOptions = {}) {
+    this.debug = debug;
     this.clock = new THREE.Clock(false);
-    this.sceneManager = new SceneManager();
+    this.sceneManager = new SceneManager({ debug: this.debug });
   }
 
   start(): void {

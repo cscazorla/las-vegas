@@ -1,13 +1,19 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+export interface SceneManagerOptions {
+  debug?: boolean;
+}
+
 export class SceneManager {
   readonly scene: THREE.Scene;
   readonly camera: THREE.PerspectiveCamera;
   readonly renderer: THREE.WebGLRenderer;
   readonly controls: OrbitControls;
+  readonly debug: boolean;
 
-  constructor() {
+  constructor({ debug = false }: SceneManagerOptions = {}) {
+    this.debug = debug;
     // Scene
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x000000);
@@ -36,6 +42,10 @@ export class SceneManager {
 
     this.setupLighting();
     this.createDemoScene();
+
+    if (this.debug) {
+      this.scene.add(new THREE.AxesHelper(5));
+    }
   }
 
   private setupLighting(): void {

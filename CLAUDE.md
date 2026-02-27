@@ -49,6 +49,16 @@ All commands run from the repo root:
 | `npm run build` | Type-check + production build → `packages/game/dist/` |
 | `npm run preview` | Preview production build locally |
 
+## Debug Mode
+
+A project-wide `debug` flag is owned by `Game` and passed down to subsystems.
+
+- Defaults to `true` in dev (`import.meta.env.DEV`) unless overridden
+- Controlled via `VITE_DEBUG` env var in `packages/game/.env.local` (gitignored)
+- `packages/game/.env.example` is the committed template
+- When debug is on: `THREE.AxesHelper` visible at world origin
+- Production builds always have debug off
+
 ## Three.js Skills
 
 Two Claude Code skills are available in `.claude/skills/`:
