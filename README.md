@@ -53,7 +53,7 @@ packages/
   game/          # Main game package (@las-vegas/game)
     src/
       core/      # Game loop, lifecycle, World (entity container), Grid (cell coordinate system)
-      entities/  # Entity types and mesh factories
+      entities/  # Entity types, mesh factories, and managers (e.g. CabinetManager)
       rendering/ # Scene, camera, renderer, lights
 ```
 

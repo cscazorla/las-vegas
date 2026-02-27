@@ -20,7 +20,7 @@ export class Game {
     this.world = new World(this.sceneManager.scene, this.debug);
 
     // Demo cabinet at cell (0, 0) → world (0.5, 0, 0.5)
-    this.world.addCabinet(0, 0);
+    this.world.cabinets.add(0, 0);
   }
 
   start(): void {

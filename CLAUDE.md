@@ -22,7 +22,8 @@ Monorepo scaffolded with game loop, Three.js rendering, and entity tracking work
 - Single package: `@las-vegas/game` (Vite + TypeScript + Three.js)
 - Game loop via `requestAnimationFrame` with `THREE.Clock` and delta clamping
 - **Grid system:** `Grid` class (`core/Grid.ts`) defines a cell-based coordinate system. Default floor is 10×10 units with 1-unit cells. Provides `cellToWorld()` / `worldToCell()` conversions and a `createHelper()` factory that returns a `THREE.GridHelper` for debug visualization.
-- **Entity system:** `World` class owns the `Grid` and all entities (cabinets now, customers/staff later). Each entity has a numeric auto-increment ID, a `type` discriminator, and an `object3D` — Three.js `Object3D` is the single source of truth for position/rotation. `World` accepts a `debug` flag; when true, it adds the grid overlay to the scene.
+- **Entity system:** `World` class owns the `Grid` and is a generic entity container. It exposes `addEntity()`, `removeEntity()`, and `getEntitiesByType<T>()` — no domain-specific logic. Each entity has a numeric auto-increment ID, a `type` discriminator, and an `object3D` — Three.js `Object3D` is the single source of truth for position/rotation. `World` accepts a `debug` flag; when true, it adds the grid overlay to the scene.
+- **CabinetManager** (`entities/CabinetManager.ts`) is owned by `World` and exposed as `world.cabinets`. Provides cabinet-specific operations (`add`, `getAll`, `remove`). Future entity types (customers, staff) should follow the same manager pattern — each manager is created by `World` and accessed as a property (e.g. `world.customers`).
 - Cabinet mesh creation lives in `entities/createCabinetMesh.ts` (factory returns a `THREE.Group`)
 - Future: State machine for game states (menu, playing, paused)
 
