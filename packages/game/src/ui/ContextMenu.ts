@@ -26,10 +26,7 @@ export class ContextMenu {
     document.body.appendChild(this.container);
   }
 
-  show(
-    screenPosition: { x: number; y: number },
-    items: ContextMenuItem[],
-  ): void {
+  show(screenPosition: { x: number; y: number }, items: ContextMenuItem[]): void {
     this.container.replaceChildren();
 
     for (const item of items) {

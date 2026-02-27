@@ -34,6 +34,10 @@ export class Grid {
     };
   }
 
+  contains(col: number, row: number): boolean {
+    return col >= this.minCol && col <= this.maxCol && row >= this.minRow && row <= this.maxRow;
+  }
+
   createHelper(): THREE.GridHelper {
     const size = (this.maxCol - this.minCol + 1) * this.cellSize;
     const divisions = size / this.cellSize;

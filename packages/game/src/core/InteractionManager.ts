@@ -18,6 +18,9 @@ export class InteractionManager {
   private pointerDownPos: { x: number; y: number } | null = null;
   private contextMenu: ContextMenu;
 
+  private floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+  private moveState: { entity: Entity; originalPos: THREE.Vector3 } | null = null;
+
   constructor(
     private camera: THREE.Camera,
     private domElement: HTMLElement,
@@ -28,6 +31,8 @@ export class InteractionManager {
     this.domElement.addEventListener('pointermove', this.onPointerMove);
     this.domElement.addEventListener('pointerdown', this.onPointerDown);
     this.domElement.addEventListener('pointerup', this.onPointerUp);
+    window.addEventListener('keydown', this.onKeyDown);
+    this.domElement.addEventListener('contextmenu', this.onContextMenu);
   }
 
   get selected(): Entity | null {
@@ -35,6 +40,22 @@ export class InteractionManager {
   }
 
   update(): void {
+    if (this.moveState) {
+      this.raycaster.setFromCamera(this.pointer, this.camera);
+      const hit = new THREE.Vector3();
+      if (this.raycaster.ray.intersectPlane(this.floorPlane, hit)) {
+        const cell = this.world.grid.worldToCell(hit.x, hit.z);
+        if (
+          this.world.grid.contains(cell.col, cell.row) &&
+          !this.world.isCellOccupied(cell.col, cell.row, this.moveState.entity.id)
+        ) {
+          const snapped = this.world.grid.cellToWorld(cell.col, cell.row);
+          this.moveState.entity.object3D.position.copy(snapped);
+        }
+      }
+      return;
+    }
+
     this.raycaster.setFromCamera(this.pointer, this.camera);
 
     const objects = this.world.getEntityObjects();
@@ -77,9 +98,7 @@ export class InteractionManager {
 
     // Track context menu to selected entity each frame
     if (this.selectedEntity && this.contextMenu.visible) {
-      this.contextMenu.updatePosition(
-        this.projectToScreen(this.selectedEntity.object3D.position),
-      );
+      this.contextMenu.updatePosition(this.projectToScreen(this.selectedEntity.object3D.position));
     }
   }
 
@@ -87,11 +106,14 @@ export class InteractionManager {
     this.domElement.removeEventListener('pointermove', this.onPointerMove);
     this.domElement.removeEventListener('pointerdown', this.onPointerDown);
     this.domElement.removeEventListener('pointerup', this.onPointerUp);
+    window.removeEventListener('keydown', this.onKeyDown);
+    this.domElement.removeEventListener('contextmenu', this.onContextMenu);
 
     if (this.hoveredEntity) removeHighlight(this.hoveredEntity.object3D);
     if (this.selectedEntity) removeHighlight(this.selectedEntity.object3D);
     this.hoveredEntity = null;
     this.selectedEntity = null;
+    this.moveState = null;
     this.contextMenu.dispose();
   }
 
@@ -126,6 +148,15 @@ export class InteractionManager {
 
     if (distance >= CLICK_THRESHOLD) return; // was a drag, not a click
 
+    // Move mode: click to finalize placement
+    if (this.moveState) {
+      const pos = this.moveState.entity.object3D.position;
+      const cell = this.world.grid.worldToCell(pos.x, pos.z);
+      this.world.moveEntity(this.moveState.entity.id, cell.col, cell.row);
+      this.moveState = null;
+      return;
+    }
+
     if (this.hoveredEntity) {
       // Clicking a new entity
       if (this.hoveredEntity !== this.selectedEntity) {
@@ -138,22 +169,18 @@ export class InteractionManager {
         // Select new
         this.selectedEntity = this.hoveredEntity;
         applyHighlight(this.selectedEntity.object3D, 'select');
-        const items = this.world.getMenuItems(this.selectedEntity).map(
-          (item) => ({
-            ...item,
-            action: item.action
-              ? () => {
-                  this.selectedEntity = null;
-                  this.hoveredEntity = null;
-                  item.action!();
-                }
-              : undefined,
-          }),
-        );
-        this.contextMenu.show(
-          this.projectToScreen(this.selectedEntity.object3D.position),
-          items,
-        );
+        const menuContext = { startMove: (entity: Entity) => this.enterMoveMode(entity) };
+        const items = this.world.getMenuItems(this.selectedEntity, menuContext).map((item) => ({
+          ...item,
+          action: item.action
+            ? () => {
+                this.selectedEntity = null;
+                this.hoveredEntity = null;
+                item.action!();
+              }
+            : undefined,
+        }));
+        this.contextMenu.show(this.projectToScreen(this.selectedEntity.object3D.position), items);
       }
       // Clicking the already-selected entity does nothing
     } else {
@@ -163,6 +190,34 @@ export class InteractionManager {
         this.selectedEntity = null;
       }
       this.contextMenu.hide();
+    }
+  };
+
+  private enterMoveMode(entity: Entity): void {
+    this.moveState = {
+      entity,
+      originalPos: entity.object3D.position.clone(),
+    };
+    this.contextMenu.hide();
+    removeHighlight(entity.object3D);
+    this.selectedEntity = null;
+    this.hoveredEntity = null;
+  }
+
+  private cancelMove(): void {
+    if (!this.moveState) return;
+    this.moveState.entity.object3D.position.copy(this.moveState.originalPos);
+    this.moveState = null;
+  }
+
+  private onKeyDown = (event: KeyboardEvent): void => {
+    if (event.key === 'Escape') this.cancelMove();
+  };
+
+  private onContextMenu = (event: MouseEvent): void => {
+    if (this.moveState) {
+      event.preventDefault();
+      this.cancelMove();
     }
   };
 }

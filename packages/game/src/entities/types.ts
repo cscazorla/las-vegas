@@ -19,7 +19,11 @@ export interface Cabinet extends Entity {
   readonly catalogId: string;
 }
 
+export interface MenuContext {
+  startMove: (entity: Entity) => void;
+}
+
 export interface EntityManager {
   readonly entityType: string;
-  getContextMenuItems(entity: Entity): ContextMenuItem[];
+  getContextMenuItems(entity: Entity, context: MenuContext): ContextMenuItem[];
 }

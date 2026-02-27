@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { Entity, EntityManager, CellPosition } from '@/entities/types';
+import type { Entity, EntityManager, MenuContext, CellPosition } from '@/entities/types';
 import type { ContextMenuItem } from '@/ui/ContextMenu';
 import { Grid } from '@/core/Grid';
 import { CabinetManager } from '@/entities/CabinetManager';
@@ -56,8 +56,26 @@ export class World {
     return [...this.entities.values()].map((e) => e.object3D);
   }
 
-  getMenuItems(entity: Entity): ContextMenuItem[] {
-    return this.managers.get(entity.type)?.getContextMenuItems(entity) ?? [];
+  isCellOccupied(col: number, row: number, excludeId?: number): boolean {
+    for (const entity of this.entities.values()) {
+      if (entity.id === excludeId) continue;
+      if (entity.cell && entity.cell.col === col && entity.cell.row === row) return true;
+    }
+    return false;
+  }
+
+  moveEntity(id: number, col: number, row: number): boolean {
+    const entity = this.entities.get(id);
+    if (!entity || !this.grid.contains(col, row)) return false;
+    if (this.isCellOccupied(col, row, id)) return false;
+    const worldPos = this.grid.cellToWorld(col, row);
+    entity.object3D.position.copy(worldPos);
+    this.entities.set(id, { ...entity, cell: { col, row } });
+    return true;
+  }
+
+  getMenuItems(entity: Entity, context: MenuContext): ContextMenuItem[] {
+    return this.managers.get(entity.type)?.getContextMenuItems(entity, context) ?? [];
   }
 
   private registerManager(manager: EntityManager): void {

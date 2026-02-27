@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { Cabinet, Entity, EntityManager } from '@/entities/types';
+import type { Cabinet, Entity, EntityManager, MenuContext } from '@/entities/types';
 import type { ContextMenuItem } from '@/ui/ContextMenu';
 import type { CabinetDefinition } from '@/data/cabinetCatalog';
 import { CABINET_CATALOG } from '@/data/cabinetCatalog';
@@ -30,13 +30,16 @@ export class CabinetManager implements EntityManager {
     return this.world.removeEntity(id);
   }
 
-  getContextMenuItems(entity: Entity): ContextMenuItem[] {
+  getContextMenuItems(entity: Entity, context: MenuContext): ContextMenuItem[] {
     return [
       {
         label: 'Delete',
         action: () => this.remove(entity.id),
       },
-      { label: 'Move', disabled: true },
+      {
+        label: 'Move',
+        action: () => context.startMove(entity),
+      },
     ];
   }
 
