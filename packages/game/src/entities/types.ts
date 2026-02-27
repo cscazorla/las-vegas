@@ -1,11 +1,18 @@
 import type * as THREE from 'three';
 
+export interface CellPosition {
+  readonly col: number;
+  readonly row: number;
+}
+
 export interface Entity {
   readonly id: number;
   readonly type: string;
   readonly object3D: THREE.Object3D;
+  readonly cell?: CellPosition;
 }
 
 export interface Cabinet extends Entity {
   readonly type: 'cabinet';
+  readonly cell: CellPosition;
 }

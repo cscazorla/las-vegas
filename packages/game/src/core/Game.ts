@@ -17,10 +17,10 @@ export class Game {
     this.debug = debug;
     this.clock = new THREE.Clock(false);
     this.sceneManager = new SceneManager({ debug: this.debug });
-    this.world = new World(this.sceneManager.scene);
+    this.world = new World(this.sceneManager.scene, this.debug);
 
-    // Demo cabinet at origin
-    this.world.addCabinet();
+    // Demo cabinet at cell (0, 0) → world (0.5, 0, 0.5)
+    this.world.addCabinet(0, 0);
   }
 
   start(): void {
