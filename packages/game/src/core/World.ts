@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import type { Entity, CellPosition } from '@/entities/types';
+import type { Entity, EntityManager, CellPosition } from '@/entities/types';
+import type { ContextMenuItem } from '@/ui/ContextMenu';
 import { Grid } from '@/core/Grid';
 import { CabinetManager } from '@/entities/CabinetManager';
 
@@ -7,6 +8,7 @@ export class World {
   readonly grid: Grid;
   readonly cabinets: CabinetManager;
   private entities = new Map<number, Entity>();
+  private managers = new Map<string, EntityManager>();
   private nextId = 1;
 
   constructor(
@@ -15,6 +17,7 @@ export class World {
   ) {
     this.grid = new Grid({ width: 10, depth: 10, cellSize: 1 });
     this.cabinets = new CabinetManager(this);
+    this.registerManager(this.cabinets);
 
     if (this.debug) {
       this.scene.add(this.grid.createHelper());
@@ -25,6 +28,7 @@ export class World {
     this.scene.add(object3D);
 
     const id = this.nextId++;
+    object3D.userData.entityId = id;
     const entity: Entity = { id, type, object3D, cell };
     this.entities.set(id, entity);
 
@@ -46,6 +50,18 @@ export class World {
 
   getEntity(id: number): Entity | undefined {
     return this.entities.get(id);
+  }
+
+  getEntityObjects(): THREE.Object3D[] {
+    return [...this.entities.values()].map((e) => e.object3D);
+  }
+
+  getMenuItems(entity: Entity): ContextMenuItem[] {
+    return this.managers.get(entity.type)?.getContextMenuItems(entity) ?? [];
+  }
+
+  private registerManager(manager: EntityManager): void {
+    this.managers.set(manager.entityType, manager);
   }
 
   dispose(): void {

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { SceneManager } from '@/rendering/SceneManager';
 import { World } from '@/core/World';
+import { InteractionManager } from '@/core/InteractionManager';
 
 export interface GameOptions {
   debug?: boolean;
@@ -11,6 +12,7 @@ export class Game {
   private clock: THREE.Clock;
   private sceneManager: SceneManager;
   private world: World;
+  private interaction: InteractionManager;
   private animationFrameId: number | null = null;
 
   constructor({ debug = false }: GameOptions = {}) {
@@ -19,8 +21,17 @@ export class Game {
     this.sceneManager = new SceneManager({ debug: this.debug });
     this.world = new World(this.sceneManager.scene, this.debug);
 
-    // Demo cabinet at cell (0, 0) → world (0.5, 0, 0.5)
+    this.interaction = new InteractionManager(
+      this.sceneManager.camera,
+      this.sceneManager.renderer.domElement,
+      this.world,
+    );
+
+    // Demo cabinets at cell (0, 0) → world (0.5, 0, 0.5)
     this.world.cabinets.add(0, 0);
+    this.world.cabinets.add(-1, 0);
+    this.world.cabinets.add(0, -1, new THREE.Euler(0, Math.PI, 0));
+    this.world.cabinets.add(-1, -1, new THREE.Euler(0, -Math.PI, 0));
   }
 
   start(): void {
@@ -37,7 +48,7 @@ export class Game {
   };
 
   private update(_delta: number): void {
-    // Future: update entities, systems, etc.
+    this.interaction.update();
   }
 
   private onResize = (): void => {
@@ -55,6 +66,7 @@ export class Game {
 
   dispose(): void {
     this.stop();
+    this.interaction.dispose();
     this.world.dispose();
     this.sceneManager.dispose();
   }
