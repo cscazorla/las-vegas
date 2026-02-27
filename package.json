@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "dev": "npm run dev -w @las-vegas/game",
+    "build": "npm run build -w @las-vegas/game",
+    "preview": "npm run preview -w @las-vegas/game"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
