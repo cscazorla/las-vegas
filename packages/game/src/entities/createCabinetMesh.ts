@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 
-export function createCabinetMesh(): THREE.Group {
+export function createCabinetMesh(color: number = 0xcc2233): THREE.Group {
   const group = new THREE.Group();
   group.name = 'cabinet';
 
   // Cabinet body
   const cabinetGeo = new THREE.BoxGeometry(0.8, 1.8, 0.6);
-  const cabinetMat = new THREE.MeshStandardMaterial({ color: 0xcc2233 });
+  const cabinetMat = new THREE.MeshStandardMaterial({ color });
   const body = new THREE.Mesh(cabinetGeo, cabinetMat);
   body.position.y = 0.9; // half height, sits on floor
   body.castShadow = true;

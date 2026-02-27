@@ -16,6 +16,7 @@ export interface Entity {
 export interface Cabinet extends Entity {
   readonly type: 'cabinet';
   readonly cell: CellPosition;
+  readonly catalogId: string;
 }
 
 export interface EntityManager {

@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import type { Cabinet, Entity, EntityManager } from '@/entities/types';
 import type { ContextMenuItem } from '@/ui/ContextMenu';
+import type { CabinetDefinition } from '@/data/cabinetCatalog';
+import { CABINET_CATALOG } from '@/data/cabinetCatalog';
 import { createCabinetMesh } from '@/entities/createCabinetMesh';
 import { World } from '@/core/World';
 
@@ -9,14 +11,15 @@ export class CabinetManager implements EntityManager {
 
   constructor(private world: World) {}
 
-  add(col: number, row: number, rotation?: THREE.Euler): Cabinet {
-    const mesh = createCabinetMesh();
+  add(catalogId: string, col: number, row: number, rotation?: THREE.Euler): Cabinet {
+    const definition = this.getDefinition(catalogId);
+    const mesh = createCabinetMesh(definition.color);
     const worldPos = this.world.grid.cellToWorld(col, row);
     mesh.position.copy(worldPos);
     if (rotation) mesh.rotation.copy(rotation);
 
     const entity = this.world.addEntity(mesh, 'cabinet', { col, row });
-    return entity as Cabinet;
+    return { ...entity, type: 'cabinet', cell: { col, row }, catalogId } as Cabinet;
   }
 
   getAll(): Cabinet[] {
@@ -35,5 +38,13 @@ export class CabinetManager implements EntityManager {
       },
       { label: 'Move', disabled: true },
     ];
+  }
+
+  private getDefinition(catalogId: string): CabinetDefinition {
+    const def = CABINET_CATALOG.find((d) => d.id === catalogId);
+    if (!def) {
+      throw new Error(`Unknown cabinet catalog ID: "${catalogId}"`);
+    }
+    return def;
   }
 }

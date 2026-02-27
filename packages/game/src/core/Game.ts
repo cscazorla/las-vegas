@@ -28,10 +28,10 @@ export class Game {
     );
 
     // Demo cabinets at cell (0, 0) → world (0.5, 0, 0.5)
-    this.world.cabinets.add(0, 0);
-    this.world.cabinets.add(-1, 0);
-    this.world.cabinets.add(0, -1, new THREE.Euler(0, Math.PI, 0));
-    this.world.cabinets.add(-1, -1, new THREE.Euler(0, -Math.PI, 0));
+    this.world.cabinets.add('street-fighter-ii', 0, 0);
+    this.world.cabinets.add('pac-man', -1, 0);
+    this.world.cabinets.add('space-invaders', 0, -1, new THREE.Euler(0, Math.PI, 0));
+    this.world.cabinets.add('donkey-kong', -1, -1, new THREE.Euler(0, -Math.PI, 0));
   }
 
   start(): void {
