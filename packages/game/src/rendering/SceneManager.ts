@@ -73,26 +73,6 @@ export class SceneManager {
     floor.rotation.x = -Math.PI / 2;
     floor.receiveShadow = true;
     this.scene.add(floor);
-
-    // Arcade cabinet body
-    const cabinetGeo = new THREE.BoxGeometry(0.8, 1.8, 0.6);
-    const cabinetMat = new THREE.MeshStandardMaterial({ color: 0xcc2233 });
-    const cabinet = new THREE.Mesh(cabinetGeo, cabinetMat);
-    cabinet.position.y = 0.9; // half height, sits on floor
-    cabinet.castShadow = true;
-    cabinet.receiveShadow = true;
-    this.scene.add(cabinet);
-
-    // Screen (child of cabinet)
-    const screenGeo = new THREE.BoxGeometry(0.6, 0.5, 0.05);
-    const screenMat = new THREE.MeshStandardMaterial({
-      color: 0x00ff66,
-      emissive: 0x00ff66,
-      emissiveIntensity: 0.6,
-    });
-    const screen = new THREE.Mesh(screenGeo, screenMat);
-    screen.position.set(0, 0.35, 0.325); // upper-front of cabinet
-    cabinet.add(screen);
   }
 
   render(): void {

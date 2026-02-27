@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { SceneManager } from '@/rendering/SceneManager';
+import { World } from '@/core/World';
 
 export interface GameOptions {
   debug?: boolean;
@@ -9,12 +10,17 @@ export class Game {
   readonly debug: boolean;
   private clock: THREE.Clock;
   private sceneManager: SceneManager;
+  private world: World;
   private animationFrameId: number | null = null;
 
   constructor({ debug = false }: GameOptions = {}) {
     this.debug = debug;
     this.clock = new THREE.Clock(false);
     this.sceneManager = new SceneManager({ debug: this.debug });
+    this.world = new World(this.sceneManager.scene);
+
+    // Demo cabinet at origin
+    this.world.addCabinet();
   }
 
   start(): void {
@@ -49,6 +55,7 @@ export class Game {
 
   dispose(): void {
     this.stop();
+    this.world.dispose();
     this.sceneManager.dispose();
   }
 }
