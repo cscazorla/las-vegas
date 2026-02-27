@@ -1,9 +1,11 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 export class SceneManager {
   readonly scene: THREE.Scene;
   readonly camera: THREE.PerspectiveCamera;
   readonly renderer: THREE.WebGLRenderer;
+  readonly controls: OrbitControls;
 
   constructor() {
     // Scene
@@ -27,6 +29,10 @@ export class SceneManager {
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.body.appendChild(this.renderer.domElement);
+
+    // OrbitControls — left-drag: rotate, wheel: zoom, right-drag: pan
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.controls.enableDamping = true;
 
     this.setupLighting();
     this.createDemoScene();
@@ -80,6 +86,7 @@ export class SceneManager {
   }
 
   render(): void {
+    this.controls.update();
     this.renderer.render(this.scene, this.camera);
   }
 
@@ -93,6 +100,7 @@ export class SceneManager {
   }
 
   dispose(): void {
+    this.controls.dispose();
     this.renderer.domElement.remove();
     this.renderer.dispose();
 
