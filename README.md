@@ -47,7 +47,8 @@ cp packages/game/.env.example packages/game/.env.local
 packages/
   game/          # Main game package (@las-vegas/game)
     src/
-      core/      # Game loop, lifecycle
+      core/      # Game loop, lifecycle, World (entity container)
+      entities/  # Entity types and mesh factories
       rendering/ # Scene, camera, renderer, lights
 ```
 

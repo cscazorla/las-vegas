@@ -11,7 +11,7 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## Project Status
 
-Monorepo scaffolded with game loop and Three.js rendering working.
+Monorepo scaffolded with game loop, Three.js rendering, and entity tracking working.
 
 - Game design document: `task.md`
 - Three.js reference skills: `.claude/skills/`
@@ -21,7 +21,8 @@ Monorepo scaffolded with game loop and Three.js rendering working.
 - npm workspaces monorepo (`packages/*`)
 - Single package: `@las-vegas/game` (Vite + TypeScript + Three.js)
 - Game loop via `requestAnimationFrame` with `THREE.Clock` and delta clamping
-- Future: Entity system for cabinets, customers, staff
+- **Entity system:** `World` class owns all entities (cabinets now, customers/staff later). Each entity has a numeric auto-increment ID, a `type` discriminator, and an `object3D` — Three.js `Object3D` is the single source of truth for position/rotation.
+- Cabinet mesh creation lives in `entities/createCabinetMesh.ts` (factory returns a `THREE.Group`)
 - Future: State machine for game states (menu, playing, paused)
 
 ## Domain Terminology
