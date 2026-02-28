@@ -21,6 +21,7 @@ export interface Cabinet extends Entity {
 
 export interface MenuContext {
   startMove: (entity: Entity) => void;
+  startRotation: (entity: Entity) => void;
 }
 
 export interface EntityManager {

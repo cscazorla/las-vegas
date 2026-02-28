@@ -49,6 +49,10 @@ export class CabinetManager implements EntityManager {
         label: 'Move',
         action: () => context.startMove(entity),
       },
+      {
+        label: 'Rotate',
+        action: () => context.startRotation(entity),
+      },
     ];
   }
 

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { World } from '@/core/World';
 import type { Entity } from '@/entities/types';
 import { ContextMenu } from '@/ui/ContextMenu';
+import { RotationToolbar } from '@/ui/RotationToolbar';
 
 const CLICK_THRESHOLD = 5; // px — max distance between pointerdown/up to count as click
 
@@ -21,6 +22,8 @@ export class InteractionManager {
   private floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   private moveState: { entity: Entity; originalPos: THREE.Vector3 } | null = null;
   private placementState: { entity: Entity } | null = null;
+  private rotationState: { entity: Entity; originalRotationY: number } | null = null;
+  private rotationToolbar: RotationToolbar;
 
   constructor(
     private camera: THREE.Camera,
@@ -28,6 +31,12 @@ export class InteractionManager {
     private world: World,
   ) {
     this.contextMenu = new ContextMenu();
+    this.rotationToolbar = new RotationToolbar({
+      onRotateCCW: () => this.rotateActive(-Math.PI / 2),
+      onRotateCW: () => this.rotateActive(Math.PI / 2),
+      onConfirm: () => this.confirmRotation(),
+      onCancel: () => this.cancelRotation(),
+    });
 
     this.world.setPlacementHandler((entity) => {
       this.cancelActiveMode();
@@ -46,6 +55,8 @@ export class InteractionManager {
   }
 
   update(): void {
+    if (this.rotationState) return;
+
     const activeEntity = this.moveState?.entity ?? this.placementState?.entity;
     if (activeEntity) {
       this.raycaster.setFromCamera(this.pointer, this.camera);
@@ -122,7 +133,9 @@ export class InteractionManager {
     this.selectedEntity = null;
     this.moveState = null;
     this.placementState = null;
+    this.rotationState = null;
     this.contextMenu.dispose();
+    this.rotationToolbar.dispose();
   }
 
   private projectToScreen(position: THREE.Vector3): { x: number; y: number } {
@@ -156,6 +169,9 @@ export class InteractionManager {
 
     if (distance >= CLICK_THRESHOLD) return; // was a drag, not a click
 
+    // Rotation mode: clicks handled via toolbar, not canvas
+    if (this.rotationState) return;
+
     // Move/placement mode: click to finalize
     if (this.moveState || this.placementState) {
       const entity = (this.moveState?.entity ?? this.placementState?.entity)!;
@@ -179,7 +195,10 @@ export class InteractionManager {
         // Select new
         this.selectedEntity = this.hoveredEntity;
         applyHighlight(this.selectedEntity.object3D, 'select');
-        const menuContext = { startMove: (entity: Entity) => this.enterMoveMode(entity) };
+        const menuContext = {
+          startMove: (entity: Entity) => this.enterMoveMode(entity),
+          startRotation: (entity: Entity) => this.enterRotationMode(entity),
+        };
         const items = this.world.getMenuItems(this.selectedEntity, menuContext).map((item) => ({
           ...item,
           action: item.action
@@ -223,7 +242,42 @@ export class InteractionManager {
     this.hoveredEntity = null;
   }
 
+  private enterRotationMode(entity: Entity): void {
+    this.cancelActiveMode();
+    this.rotationState = {
+      entity,
+      originalRotationY: entity.object3D.rotation.y,
+    };
+    this.contextMenu.hide();
+    removeHighlight(entity.object3D);
+    this.selectedEntity = null;
+    this.hoveredEntity = null;
+    this.rotationToolbar.show();
+  }
+
+  private rotateActive(deltaY: number): void {
+    if (!this.rotationState) return;
+    this.rotationState.entity.object3D.rotation.y += deltaY;
+  }
+
+  private confirmRotation(): void {
+    this.rotationState = null;
+    this.rotationToolbar.hide();
+  }
+
+  private cancelRotation(): void {
+    if (!this.rotationState) return;
+    this.rotationState.entity.object3D.rotation.y = this.rotationState.originalRotationY;
+    this.rotationState = null;
+    this.rotationToolbar.hide();
+  }
+
   cancelActiveMode(): void {
+    if (this.rotationState) {
+      this.rotationState.entity.object3D.rotation.y = this.rotationState.originalRotationY;
+      this.rotationState = null;
+      this.rotationToolbar.hide();
+    }
     if (this.moveState) {
       this.moveState.entity.object3D.position.copy(this.moveState.originalPos);
       this.moveState = null;
@@ -235,6 +289,10 @@ export class InteractionManager {
   }
 
   private cancelMove(): void {
+    if (this.rotationState) {
+      this.cancelRotation();
+      return;
+    }
     if (this.moveState) {
       this.moveState.entity.object3D.position.copy(this.moveState.originalPos);
       this.moveState = null;
@@ -251,7 +309,7 @@ export class InteractionManager {
   };
 
   private onContextMenu = (event: MouseEvent): void => {
-    if (this.moveState || this.placementState) {
+    if (this.moveState || this.placementState || this.rotationState) {
       event.preventDefault();
       this.cancelMove();
     }
