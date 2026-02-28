@@ -11,6 +11,11 @@ export class CabinetManager implements EntityManager {
 
   constructor(private world: World) {}
 
+  startPlacement(catalogId: string): void {
+    const cabinet = this.add(catalogId, 0, 0);
+    this.world.startPlacement(cabinet);
+  }
+
   add(catalogId: string, col: number, row: number, rotation?: THREE.Euler): Cabinet {
     const definition = this.getDefinition(catalogId);
     const mesh = createCabinetMesh(definition.color);

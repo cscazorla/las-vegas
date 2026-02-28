@@ -10,6 +10,7 @@ export class World {
   private entities = new Map<number, Entity>();
   private managers = new Map<string, EntityManager>();
   private nextId = 1;
+  private placementHandler: ((entity: Entity) => void) | null = null;
 
   constructor(
     private scene: THREE.Scene,
@@ -72,6 +73,14 @@ export class World {
     entity.object3D.position.copy(worldPos);
     this.entities.set(id, { ...entity, cell: { col, row } });
     return true;
+  }
+
+  setPlacementHandler(handler: (entity: Entity) => void): void {
+    this.placementHandler = handler;
+  }
+
+  startPlacement(entity: Entity): void {
+    this.placementHandler?.(entity);
   }
 
   getMenuItems(entity: Entity, context: MenuContext): ContextMenuItem[] {

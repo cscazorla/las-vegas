@@ -2,6 +2,9 @@ import * as THREE from 'three';
 import { SceneManager } from '@/rendering/SceneManager';
 import { World } from '@/core/World';
 import { InteractionManager } from '@/core/InteractionManager';
+import { SideMenu } from '@/ui/SideMenu';
+import { CabinetPanel } from '@/ui/CabinetPanel';
+import { CABINET_CATALOG } from '@/data/cabinetCatalog';
 
 export interface GameOptions {
   debug?: boolean;
@@ -13,6 +16,7 @@ export class Game {
   private sceneManager: SceneManager;
   private world: World;
   private interaction: InteractionManager;
+  private sideMenu: SideMenu;
   private animationFrameId: number | null = null;
 
   constructor({ debug = false }: GameOptions = {}) {
@@ -26,6 +30,14 @@ export class Game {
       this.sceneManager.renderer.domElement,
       this.world,
     );
+
+    const cabinetPanel = new CabinetPanel(CABINET_CATALOG, {
+      onSelect: (catalogId) => this.world.cabinets.startPlacement(catalogId),
+    });
+
+    this.sideMenu = new SideMenu([
+      { label: '+', tooltip: 'New Cabinet', panel: cabinetPanel },
+    ]);
 
     // Demo cabinets at cell (0, 0) → world (0.5, 0, 0.5)
     this.world.cabinets.add('street-fighter-ii', 0, 0);
@@ -66,6 +78,7 @@ export class Game {
 
   dispose(): void {
     this.stop();
+    this.sideMenu.dispose();
     this.interaction.dispose();
     this.world.dispose();
     this.sceneManager.dispose();

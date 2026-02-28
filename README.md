@@ -52,9 +52,11 @@ cp packages/game/.env.example packages/game/.env.local
 packages/
   game/          # Main game package (@las-vegas/game)
     src/
-      core/      # Game loop, lifecycle, World (entity container), Grid (cell coordinate system)
+      core/      # Game loop, World (entity container), Grid, InteractionManager
+      data/      # Static catalogs (cabinet definitions)
       entities/  # Entity types, mesh factories, and managers (e.g. CabinetManager)
       rendering/ # Scene, camera, renderer, lights
+      ui/        # HTML overlays — SideMenu, CabinetPanel, ContextMenu
 ```
 
 ## License

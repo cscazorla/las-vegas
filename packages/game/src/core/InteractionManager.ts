@@ -20,6 +20,7 @@ export class InteractionManager {
 
   private floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   private moveState: { entity: Entity; originalPos: THREE.Vector3 } | null = null;
+  private placementState: { entity: Entity } | null = null;
 
   constructor(
     private camera: THREE.Camera,
@@ -27,6 +28,11 @@ export class InteractionManager {
     private world: World,
   ) {
     this.contextMenu = new ContextMenu();
+
+    this.world.setPlacementHandler((entity) => {
+      this.cancelActiveMode();
+      this.enterPlacementMode(entity);
+    });
 
     this.domElement.addEventListener('pointermove', this.onPointerMove);
     this.domElement.addEventListener('pointerdown', this.onPointerDown);
@@ -40,17 +46,18 @@ export class InteractionManager {
   }
 
   update(): void {
-    if (this.moveState) {
+    const activeEntity = this.moveState?.entity ?? this.placementState?.entity;
+    if (activeEntity) {
       this.raycaster.setFromCamera(this.pointer, this.camera);
       const hit = new THREE.Vector3();
       if (this.raycaster.ray.intersectPlane(this.floorPlane, hit)) {
         const cell = this.world.grid.worldToCell(hit.x, hit.z);
         if (
           this.world.grid.contains(cell.col, cell.row) &&
-          !this.world.isCellOccupied(cell.col, cell.row, this.moveState.entity.id)
+          !this.world.isCellOccupied(cell.col, cell.row, activeEntity.id)
         ) {
           const snapped = this.world.grid.cellToWorld(cell.col, cell.row);
-          this.moveState.entity.object3D.position.copy(snapped);
+          activeEntity.object3D.position.copy(snapped);
         }
       }
       return;
@@ -114,6 +121,7 @@ export class InteractionManager {
     this.hoveredEntity = null;
     this.selectedEntity = null;
     this.moveState = null;
+    this.placementState = null;
     this.contextMenu.dispose();
   }
 
@@ -148,12 +156,14 @@ export class InteractionManager {
 
     if (distance >= CLICK_THRESHOLD) return; // was a drag, not a click
 
-    // Move mode: click to finalize placement
-    if (this.moveState) {
-      const pos = this.moveState.entity.object3D.position;
+    // Move/placement mode: click to finalize
+    if (this.moveState || this.placementState) {
+      const entity = (this.moveState?.entity ?? this.placementState?.entity)!;
+      const pos = entity.object3D.position;
       const cell = this.world.grid.worldToCell(pos.x, pos.z);
-      this.world.moveEntity(this.moveState.entity.id, cell.col, cell.row);
+      this.world.moveEntity(entity.id, cell.col, cell.row);
       this.moveState = null;
+      this.placementState = null;
       return;
     }
 
@@ -193,6 +203,15 @@ export class InteractionManager {
     }
   };
 
+  enterPlacementMode(entity: Entity): void {
+    this.cancelActiveMode();
+    this.placementState = { entity };
+    this.contextMenu.hide();
+    removeHighlight(entity.object3D);
+    this.selectedEntity = null;
+    this.hoveredEntity = null;
+  }
+
   private enterMoveMode(entity: Entity): void {
     this.moveState = {
       entity,
@@ -204,10 +223,27 @@ export class InteractionManager {
     this.hoveredEntity = null;
   }
 
+  cancelActiveMode(): void {
+    if (this.moveState) {
+      this.moveState.entity.object3D.position.copy(this.moveState.originalPos);
+      this.moveState = null;
+    }
+    if (this.placementState) {
+      this.world.removeEntity(this.placementState.entity.id);
+      this.placementState = null;
+    }
+  }
+
   private cancelMove(): void {
-    if (!this.moveState) return;
-    this.moveState.entity.object3D.position.copy(this.moveState.originalPos);
-    this.moveState = null;
+    if (this.moveState) {
+      this.moveState.entity.object3D.position.copy(this.moveState.originalPos);
+      this.moveState = null;
+      return;
+    }
+    if (this.placementState) {
+      this.world.removeEntity(this.placementState.entity.id);
+      this.placementState = null;
+    }
   }
 
   private onKeyDown = (event: KeyboardEvent): void => {
@@ -215,7 +251,7 @@ export class InteractionManager {
   };
 
   private onContextMenu = (event: MouseEvent): void => {
-    if (this.moveState) {
+    if (this.moveState || this.placementState) {
       event.preventDefault();
       this.cancelMove();
     }
