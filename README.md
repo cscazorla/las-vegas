@@ -55,9 +55,16 @@ packages/
       core/      # Game loop, World (entity container), Grid, InteractionManager
       data/      # Static catalogs (cabinet definitions)
       entities/  # Entity types, mesh factories, and managers (e.g. CabinetManager)
-      rendering/ # Scene, camera, renderer, lights
+      rendering/ # Scene, camera, renderer, lights, asset loading
       ui/        # HTML overlays — SideMenu, CabinetPanel, ContextMenu
+    public/
+      models/    # 3D GLB models + Textures/colormap.png
+      textures/  # Alternate color palettes (variation-a, variation-b)
 ```
+
+## Assets
+
+3D models from [Mini Arcade](https://kenney.nl/assets/mini-arcade) by [Kenney](https://kenney.nl) (CC0 1.0).
 
 ## License
 

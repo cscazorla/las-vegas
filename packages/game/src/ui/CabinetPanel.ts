@@ -8,10 +8,7 @@ export class CabinetPanel {
   private container: HTMLDivElement;
   private isVisible = false;
 
-  constructor(
-    catalog: readonly CabinetDefinition[],
-    callbacks: CabinetPanelCallbacks,
-  ) {
+  constructor(catalog: readonly CabinetDefinition[], callbacks: CabinetPanelCallbacks) {
     this.container = document.createElement('div');
     this.container.style.cssText = [
       'position: fixed',
@@ -88,17 +85,6 @@ export class CabinetPanel {
       callbacks.onSelect(def.id);
       this.hide();
     });
-
-    // Color swatch
-    const swatch = document.createElement('div');
-    swatch.style.cssText = [
-      'width: 16px',
-      'height: 16px',
-      'border-radius: 3px',
-      'flex-shrink: 0',
-      `background: #${def.color.toString(16).padStart(6, '0')}`,
-    ].join(';');
-    card.appendChild(swatch);
 
     // Name + cost
     const text = document.createElement('div');

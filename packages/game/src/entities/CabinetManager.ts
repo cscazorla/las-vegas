@@ -5,11 +5,15 @@ import type { CabinetDefinition } from '@/data/cabinetCatalog';
 import { CABINET_CATALOG } from '@/data/cabinetCatalog';
 import { createCabinetMesh } from '@/entities/createCabinetMesh';
 import { World } from '@/core/World';
+import { AssetLoader } from '@/rendering/AssetLoader';
 
 export class CabinetManager implements EntityManager {
   readonly entityType = 'cabinet';
 
-  constructor(private world: World) {}
+  constructor(
+    private world: World,
+    private loader: AssetLoader,
+  ) {}
 
   startPlacement(catalogId: string): void {
     const cabinet = this.add(catalogId, 0, 0);
@@ -18,7 +22,7 @@ export class CabinetManager implements EntityManager {
 
   add(catalogId: string, col: number, row: number, rotation?: THREE.Euler): Cabinet {
     const definition = this.getDefinition(catalogId);
-    const mesh = createCabinetMesh(definition.color);
+    const mesh = createCabinetMesh(this.loader, definition.model);
     const worldPos = this.world.grid.cellToWorld(col, row);
     mesh.position.copy(worldPos);
     if (rotation) mesh.rotation.copy(rotation);

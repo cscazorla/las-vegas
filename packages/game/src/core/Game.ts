@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 import { SceneManager } from '@/rendering/SceneManager';
+import { AssetLoader } from '@/rendering/AssetLoader';
 import { World } from '@/core/World';
 import { InteractionManager } from '@/core/InteractionManager';
 import { SideMenu } from '@/ui/SideMenu';
 import { CabinetPanel } from '@/ui/CabinetPanel';
-import { CABINET_CATALOG } from '@/data/cabinetCatalog';
+import { CABINET_CATALOG, CABINET_MODEL_PATHS } from '@/data/cabinetCatalog';
 
 export interface GameOptions {
   debug?: boolean;
@@ -14,16 +15,23 @@ export class Game {
   readonly debug: boolean;
   private clock: THREE.Clock;
   private sceneManager: SceneManager;
-  private world: World;
-  private interaction: InteractionManager;
-  private sideMenu: SideMenu;
+  private loader: AssetLoader;
+  private world!: World;
+  private interaction!: InteractionManager;
+  private sideMenu!: SideMenu;
   private animationFrameId: number | null = null;
 
   constructor({ debug = false }: GameOptions = {}) {
     this.debug = debug;
     this.clock = new THREE.Clock(false);
     this.sceneManager = new SceneManager({ debug: this.debug });
-    this.world = new World(this.sceneManager.scene, this.debug);
+    this.loader = new AssetLoader();
+  }
+
+  async load(): Promise<void> {
+    await this.loader.preload([...CABINET_MODEL_PATHS]);
+
+    this.world = new World(this.sceneManager.scene, this.loader, this.debug);
 
     this.interaction = new InteractionManager(
       this.sceneManager.camera,
@@ -35,9 +43,7 @@ export class Game {
       onSelect: (catalogId) => this.world.cabinets.startPlacement(catalogId),
     });
 
-    this.sideMenu = new SideMenu([
-      { label: '+', tooltip: 'New Cabinet', panel: cabinetPanel },
-    ]);
+    this.sideMenu = new SideMenu([{ label: 'C', tooltip: 'New Cabinet', panel: cabinetPanel }]);
 
     // Demo cabinets at cell (0, 0) → world (0.5, 0, 0.5)
     this.world.cabinets.add('street-fighter-ii', 0, 0);

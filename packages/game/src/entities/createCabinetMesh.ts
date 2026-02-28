@@ -1,28 +1,18 @@
 import * as THREE from 'three';
+import { AssetLoader } from '@/rendering/AssetLoader';
 
-export function createCabinetMesh(color: number = 0xcc2233): THREE.Group {
-  const group = new THREE.Group();
+export function createCabinetMesh(loader: AssetLoader, modelPath: string): THREE.Group {
+  const group = loader.get(modelPath);
   group.name = 'cabinet';
 
-  // Cabinet body
-  const cabinetGeo = new THREE.BoxGeometry(0.8, 1.8, 0.6);
-  const cabinetMat = new THREE.MeshStandardMaterial({ color });
-  const body = new THREE.Mesh(cabinetGeo, cabinetMat);
-  body.position.y = 0.9; // half height, sits on floor
-  body.castShadow = true;
-  body.receiveShadow = true;
-  group.add(body);
-
-  // Screen (child of body)
-  const screenGeo = new THREE.BoxGeometry(0.6, 0.5, 0.05);
-  const screenMat = new THREE.MeshStandardMaterial({
-    color: 0x00ff66,
-    emissive: 0x00ff66,
-    emissiveIntensity: 0.6,
-  });
-  const screen = new THREE.Mesh(screenGeo, screenMat);
-  screen.position.set(0, 0.35, 0.325); // upper-front of cabinet
-  body.add(screen);
+  // Fit model to ~1-unit grid cell: normalize based on bounding box
+  const box = new THREE.Box3().setFromObject(group);
+  const size = box.getSize(new THREE.Vector3());
+  const maxDim = Math.max(size.x, size.z);
+  if (maxDim > 0) {
+    const scale = 1 / maxDim;
+    group.scale.setScalar(scale);
+  }
 
   return group;
 }

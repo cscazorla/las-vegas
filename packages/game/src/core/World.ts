@@ -3,6 +3,7 @@ import type { Entity, EntityManager, MenuContext, CellPosition } from '@/entitie
 import type { ContextMenuItem } from '@/ui/ContextMenu';
 import { Grid } from '@/core/Grid';
 import { CabinetManager } from '@/entities/CabinetManager';
+import { AssetLoader } from '@/rendering/AssetLoader';
 
 export class World {
   readonly grid: Grid;
@@ -14,10 +15,11 @@ export class World {
 
   constructor(
     private scene: THREE.Scene,
+    private loader: AssetLoader,
     private debug = false,
   ) {
     this.grid = new Grid({ width: 10, depth: 10, cellSize: 1 });
-    this.cabinets = new CabinetManager(this);
+    this.cabinets = new CabinetManager(this, this.loader);
     this.registerManager(this.cabinets);
 
     if (this.debug) {

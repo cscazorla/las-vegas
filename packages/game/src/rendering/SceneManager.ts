@@ -44,7 +44,7 @@ export class SceneManager {
   }
 
   private setupLighting(): void {
-    const ambient = new THREE.AmbientLight(0xffffff, 0.4);
+    const ambient = new THREE.AmbientLight(0xffffff, 0.8);
     this.scene.add(ambient);
 
     const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
