@@ -56,7 +56,7 @@ packages/
       data/      # Static catalogs (cabinet definitions)
       entities/  # Entity types, mesh factories, and managers (e.g. CabinetManager)
       rendering/ # Scene, camera, renderer, lights, asset loading
-      ui/        # HTML overlays — SideMenu, CabinetPanel, ContextMenu, TimeDisplay, MoneyDisplay
+      ui/        # HTML overlays — SideMenu, CabinetPanel, ContextMenu, TimeDisplay, MoneyDisplay, theme
     public/
       models/    # 3D GLB models + Textures/colormap.png
       textures/  # Alternate color palettes (variation-a, variation-b)

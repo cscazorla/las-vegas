@@ -1,4 +1,5 @@
 import { Wallet } from '@/core/Wallet';
+import { theme } from './theme';
 
 export class MoneyDisplay {
   private container: HTMLDivElement;
@@ -14,15 +15,15 @@ export class MoneyDisplay {
       'right: 8px',
       'z-index: 900',
       'display: flex',
-      'background: #1a1a2e',
-      'border: 1px solid #333',
+      `background: ${theme.bg}`,
+      `border: 1px solid ${theme.border}`,
       'border-radius: 6px',
       'padding: 4px 12px',
-      'box-shadow: 0 4px 12px rgba(0,0,0,0.4)',
+      `box-shadow: 0 4px 12px ${theme.shadow}`,
       'font-family: sans-serif',
       'font-size: 14px',
       'align-items: center',
-      'color: #e0e0e0',
+      `color: ${theme.text}`,
     ].join(';');
 
     this.label = document.createElement('span');

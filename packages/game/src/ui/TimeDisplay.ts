@@ -1,5 +1,6 @@
 import { GameClock, GameSpeed } from '@/core/GameClock';
 import type { GameTime } from '@/core/GameClock';
+import { theme } from './theme';
 
 export interface TimeDisplayOptions {
   onSpeedChange: (speed: GameSpeed) => void;
@@ -26,16 +27,16 @@ export class TimeDisplay {
       'transform: translateX(-50%)',
       'z-index: 900',
       'display: flex',
-      'background: #1a1a2e',
-      'border: 1px solid #333',
+      `background: ${theme.bg}`,
+      `border: 1px solid ${theme.border}`,
       'border-radius: 6px',
       'padding: 4px 8px',
-      'box-shadow: 0 4px 12px rgba(0,0,0,0.4)',
+      `box-shadow: 0 4px 12px ${theme.shadow}`,
       'font-family: sans-serif',
       'font-size: 14px',
       'gap: 4px',
       'align-items: center',
-      'color: #e0e0e0',
+      `color: ${theme.text}`,
     ].join(';');
 
     this.dayLabel = this.createLabel('Day 1');
@@ -95,7 +96,7 @@ export class TimeDisplay {
 
   private highlightActiveSpeed(active: GameSpeed): void {
     for (const [speed, btn] of this.speedButtons) {
-      btn.style.background = speed === active ? '#2a2a4e' : 'transparent';
+      btn.style.background = speed === active ? theme.hover : 'transparent';
     }
   }
 
@@ -108,22 +109,25 @@ export class TimeDisplay {
       'border: none',
       'border-radius: 4px',
       'background: transparent',
-      'color: #e0e0e0',
+      `color: ${theme.text}`,
       'cursor: pointer',
       'font-size: 14px',
       'line-height: 1',
     ].join(';');
 
     btn.addEventListener('mouseenter', () => {
-      if (btn.style.background !== 'rgb(42, 42, 78)') {
-        btn.style.background = '#3a3a5e';
+      const isActive = [...this.speedButtons.entries()].some(
+        ([speed, b]) => b === btn && speed === this.gameClock.speed,
+      );
+      if (!isActive) {
+        btn.style.background = theme.hoverLight;
       }
     });
     btn.addEventListener('mouseleave', () => {
       const isActive = [...this.speedButtons.entries()].some(
         ([speed, b]) => b === btn && speed === this.gameClock.speed,
       );
-      btn.style.background = isActive ? '#2a2a4e' : 'transparent';
+      btn.style.background = isActive ? theme.hover : 'transparent';
     });
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -138,7 +142,7 @@ export class TimeDisplay {
     sep.style.cssText = [
       'width: 1px',
       'height: 24px',
-      'background: #333',
+      `background: ${theme.border}`,
       'margin: 0 4px',
     ].join(';');
     return sep;

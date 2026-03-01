@@ -1,3 +1,5 @@
+import { theme } from './theme';
+
 export interface SidePanel {
   show(): void;
   hide(): void;
@@ -25,8 +27,8 @@ export class SideMenu {
       'top: 0',
       'height: 100%',
       'width: 48px',
-      'background: #1a1a2e',
-      'border-right: 1px solid #333',
+      `background: ${theme.bg}`,
+      `border-right: 1px solid ${theme.border}`,
       'display: flex',
       'flex-direction: column',
       'align-items: center',
@@ -71,7 +73,7 @@ export class SideMenu {
       'border: none',
       'border-radius: 6px',
       'background: transparent',
-      'color: #e0e0e0',
+      `color: ${theme.text}`,
       'font-size: 20px',
       'cursor: pointer',
       'display: flex',
@@ -80,7 +82,7 @@ export class SideMenu {
     ].join(';');
 
     btn.addEventListener('mouseenter', () => {
-      btn.style.background = '#2a2a4e';
+      btn.style.background = theme.hover;
     });
     btn.addEventListener('mouseleave', () => {
       btn.style.background = 'transparent';

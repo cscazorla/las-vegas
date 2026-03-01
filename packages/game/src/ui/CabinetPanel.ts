@@ -1,4 +1,5 @@
 import type { CabinetDefinition } from '@/data/cabinetCatalog';
+import { theme } from './theme';
 
 export interface CabinetPanelCallbacks {
   onSelect: (catalogId: string) => void;
@@ -16,8 +17,8 @@ export class CabinetPanel {
       'top: 0',
       'height: 100%',
       'width: 220px',
-      'background: #1a1a2e',
-      'border-right: 1px solid #333',
+      `background: ${theme.bg}`,
+      `border-right: 1px solid ${theme.border}`,
       'display: none',
       'flex-direction: column',
       'z-index: 900',
@@ -30,10 +31,10 @@ export class CabinetPanel {
     header.textContent = 'Cabinets';
     header.style.cssText = [
       'padding: 12px',
-      'color: #e0e0e0',
+      `color: ${theme.text}`,
       'font-size: 14px',
       'font-weight: bold',
-      'border-bottom: 1px solid #333',
+      `border-bottom: 1px solid ${theme.border}`,
     ].join(';');
     this.container.appendChild(header);
 
@@ -71,12 +72,12 @@ export class CabinetPanel {
       'gap: 10px',
       'padding: 10px 12px',
       'cursor: pointer',
-      'color: #e0e0e0',
+      `color: ${theme.text}`,
       'font-size: 13px',
     ].join(';');
 
     card.addEventListener('mouseenter', () => {
-      card.style.background = '#2a2a4e';
+      card.style.background = theme.hover;
     });
     card.addEventListener('mouseleave', () => {
       card.style.background = 'transparent';
@@ -92,7 +93,7 @@ export class CabinetPanel {
     name.textContent = def.game;
     const cost = document.createElement('div');
     cost.textContent = `$${def.cost}`;
-    cost.style.cssText = 'font-size: 11px; color: #888;';
+    cost.style.cssText = `font-size: 11px; color: ${theme.textSecondary};`;
     text.appendChild(name);
     text.appendChild(cost);
     card.appendChild(text);

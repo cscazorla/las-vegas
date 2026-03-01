@@ -1,3 +1,5 @@
+import { theme } from './theme';
+
 export interface ContextMenuItem {
   label: string;
   action?: () => void;
@@ -13,12 +15,12 @@ export class ContextMenu {
       'position: fixed',
       'z-index: 1000',
       'display: none',
-      'background: #1a1a2e',
-      'border: 1px solid #333',
+      `background: ${theme.bg}`,
+      `border: 1px solid ${theme.border}`,
       'border-radius: 6px',
       'padding: 4px',
       'min-width: 100px',
-      'box-shadow: 0 4px 12px rgba(0,0,0,0.4)',
+      `box-shadow: 0 4px 12px ${theme.shadow}`,
       'font-family: sans-serif',
       'font-size: 13px',
     ].join(';');
@@ -68,7 +70,7 @@ export class ContextMenu {
       'border: none',
       'border-radius: 4px',
       'background: transparent',
-      'color: #e0e0e0',
+      `color: ${theme.text}`,
       'text-align: left',
       'cursor: pointer',
       'font-size: 13px',
@@ -79,7 +81,7 @@ export class ContextMenu {
       btn.style.cursor = 'default';
     } else {
       btn.addEventListener('mouseenter', () => {
-        btn.style.background = '#2a2a4e';
+        btn.style.background = theme.hover;
       });
       btn.addEventListener('mouseleave', () => {
         btn.style.background = 'transparent';

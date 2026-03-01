@@ -1,3 +1,5 @@
+import { theme } from './theme';
+
 export interface RotationToolbarCallbacks {
   onRotateCCW: () => void;
   onRotateCW: () => void;
@@ -17,18 +19,20 @@ export class RotationToolbar {
       'bottom: 24px',
       'left: 50%',
       'transform: translateX(-50%)',
-      'background: #1a1a2e',
-      'border: 1px solid #333',
+      `background: ${theme.bg}`,
+      `border: 1px solid ${theme.border}`,
       'border-radius: 6px',
       'padding: 4px 8px',
-      'box-shadow: 0 4px 12px rgba(0,0,0,0.4)',
+      `box-shadow: 0 4px 12px ${theme.shadow}`,
       'font-family: sans-serif',
       'font-size: 18px',
       'gap: 4px',
       'align-items: center',
     ].join(';');
 
-    this.container.appendChild(this.createButton('↶', callbacks.onRotateCCW, 'Rotate counter-clockwise'));
+    this.container.appendChild(
+      this.createButton('↶', callbacks.onRotateCCW, 'Rotate counter-clockwise'),
+    );
     this.container.appendChild(this.createButton('↷', callbacks.onRotateCW, 'Rotate clockwise'));
     this.container.appendChild(this.createSeparator());
     this.container.appendChild(this.createButton('✓', callbacks.onConfirm, 'Confirm'));
@@ -58,14 +62,14 @@ export class RotationToolbar {
       'border: none',
       'border-radius: 4px',
       'background: transparent',
-      'color: #e0e0e0',
+      `color: ${theme.text}`,
       'cursor: pointer',
       'font-size: 18px',
       'line-height: 1',
     ].join(';');
 
     btn.addEventListener('mouseenter', () => {
-      btn.style.background = '#2a2a4e';
+      btn.style.background = theme.hover;
     });
     btn.addEventListener('mouseleave', () => {
       btn.style.background = 'transparent';
@@ -83,7 +87,7 @@ export class RotationToolbar {
     sep.style.cssText = [
       'width: 1px',
       'height: 24px',
-      'background: #333',
+      `background: ${theme.border}`,
       'margin: 0 4px',
     ].join(';');
     return sep;
