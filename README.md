@@ -52,11 +52,11 @@ cp packages/game/.env.example packages/game/.env.local
 packages/
   game/          # Main game package (@las-vegas/game)
     src/
-      core/      # Game loop, World (entity container), Grid, InteractionManager, GameClock
+      core/      # Game loop, World (entity container), Grid, InteractionManager, GameClock, Wallet
       data/      # Static catalogs (cabinet definitions)
       entities/  # Entity types, mesh factories, and managers (e.g. CabinetManager)
       rendering/ # Scene, camera, renderer, lights, asset loading
-      ui/        # HTML overlays — SideMenu, CabinetPanel, ContextMenu, TimeDisplay
+      ui/        # HTML overlays — SideMenu, CabinetPanel, ContextMenu, TimeDisplay, MoneyDisplay
     public/
       models/    # 3D GLB models + Textures/colormap.png
       textures/  # Alternate color palettes (variation-a, variation-b)

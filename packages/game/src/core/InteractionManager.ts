@@ -21,7 +21,7 @@ export class InteractionManager {
 
   private floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   private moveState: { entity: Entity; originalPos: THREE.Vector3 } | null = null;
-  private placementState: { entity: Entity } | null = null;
+  private placementState: { entity: Entity; onConfirm?: () => void } | null = null;
   private rotationState: { entity: Entity; originalRotationY: number } | null = null;
   private rotationToolbar: RotationToolbar;
 
@@ -38,9 +38,9 @@ export class InteractionManager {
       onCancel: () => this.cancelRotation(),
     });
 
-    this.world.setPlacementHandler((entity) => {
+    this.world.setPlacementHandler((entity, onConfirm) => {
       this.cancelActiveMode();
-      this.enterPlacementMode(entity);
+      this.enterPlacementMode(entity, onConfirm);
     });
 
     this.domElement.addEventListener('pointermove', this.onPointerMove);
@@ -175,11 +175,13 @@ export class InteractionManager {
     // Move/placement mode: click to finalize
     if (this.moveState || this.placementState) {
       const entity = (this.moveState?.entity ?? this.placementState?.entity)!;
+      const onConfirm = this.placementState?.onConfirm;
       const pos = entity.object3D.position;
       const cell = this.world.grid.worldToCell(pos.x, pos.z);
       this.world.moveEntity(entity.id, cell.col, cell.row);
       this.moveState = null;
       this.placementState = null;
+      onConfirm?.();
       return;
     }
 
@@ -222,9 +224,9 @@ export class InteractionManager {
     }
   };
 
-  enterPlacementMode(entity: Entity): void {
+  enterPlacementMode(entity: Entity, onConfirm?: () => void): void {
     this.cancelActiveMode();
-    this.placementState = { entity };
+    this.placementState = { entity, onConfirm };
     this.contextMenu.hide();
     removeHighlight(entity.object3D);
     this.selectedEntity = null;

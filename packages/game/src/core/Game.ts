@@ -4,8 +4,10 @@ import { AssetLoader } from '@/rendering/AssetLoader';
 import { World } from '@/core/World';
 import { InteractionManager } from '@/core/InteractionManager';
 import { GameClock } from '@/core/GameClock';
+import { Wallet } from '@/core/Wallet';
 import { SideMenu } from '@/ui/SideMenu';
 import { TimeDisplay } from '@/ui/TimeDisplay';
+import { MoneyDisplay } from '@/ui/MoneyDisplay';
 import { CabinetPanel } from '@/ui/CabinetPanel';
 import { CABINET_CATALOG, CABINET_MODEL_PATHS } from '@/data/cabinetCatalog';
 
@@ -18,10 +20,12 @@ export class Game {
   private clock: THREE.Clock;
   private sceneManager: SceneManager;
   private loader: AssetLoader;
+  private wallet!: Wallet;
   private world!: World;
   private interaction!: InteractionManager;
   private gameClock!: GameClock;
   private timeDisplay!: TimeDisplay;
+  private moneyDisplay!: MoneyDisplay;
   private sideMenu!: SideMenu;
   private animationFrameId: number | null = null;
 
@@ -35,7 +39,8 @@ export class Game {
   async load(): Promise<void> {
     await this.loader.preload([...CABINET_MODEL_PATHS]);
 
-    this.world = new World(this.sceneManager.scene, this.loader, this.debug);
+    this.wallet = new Wallet();
+    this.world = new World(this.sceneManager.scene, this.loader, this.wallet, this.debug);
 
     this.interaction = new InteractionManager(
       this.sceneManager.camera,
@@ -47,6 +52,7 @@ export class Game {
     this.timeDisplay = new TimeDisplay(this.gameClock, {
       onSpeedChange: (speed) => this.gameClock.setSpeed(speed),
     });
+    this.moneyDisplay = new MoneyDisplay(this.wallet);
 
     const cabinetPanel = new CabinetPanel(CABINET_CATALOG, {
       onSelect: (catalogId) => this.world.cabinets.startPlacement(catalogId),
@@ -95,8 +101,10 @@ export class Game {
 
   dispose(): void {
     this.stop();
+    this.moneyDisplay.dispose();
     this.timeDisplay.dispose();
     this.gameClock.dispose();
+    this.wallet.dispose();
     this.sideMenu.dispose();
     this.interaction.dispose();
     this.world.dispose();

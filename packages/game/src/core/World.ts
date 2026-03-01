@@ -4,6 +4,7 @@ import type { ContextMenuItem } from '@/ui/ContextMenu';
 import { Grid } from '@/core/Grid';
 import { CabinetManager } from '@/entities/CabinetManager';
 import { AssetLoader } from '@/rendering/AssetLoader';
+import { Wallet } from '@/core/Wallet';
 
 export class World {
   readonly grid: Grid;
@@ -11,15 +12,16 @@ export class World {
   private entities = new Map<number, Entity>();
   private managers = new Map<string, EntityManager>();
   private nextId = 1;
-  private placementHandler: ((entity: Entity) => void) | null = null;
+  private placementHandler: ((entity: Entity, onConfirm?: () => void) => void) | null = null;
 
   constructor(
     private scene: THREE.Scene,
     private loader: AssetLoader,
+    wallet: Wallet,
     private debug = false,
   ) {
     this.grid = new Grid({ width: 10, depth: 10, cellSize: 1 });
-    this.cabinets = new CabinetManager(this, this.loader);
+    this.cabinets = new CabinetManager(this, this.loader, wallet);
     this.registerManager(this.cabinets);
 
     if (this.debug) {
@@ -77,12 +79,12 @@ export class World {
     return true;
   }
 
-  setPlacementHandler(handler: (entity: Entity) => void): void {
+  setPlacementHandler(handler: (entity: Entity, onConfirm?: () => void) => void): void {
     this.placementHandler = handler;
   }
 
-  startPlacement(entity: Entity): void {
-    this.placementHandler?.(entity);
+  startPlacement(entity: Entity, onConfirm?: () => void): void {
+    this.placementHandler?.(entity, onConfirm);
   }
 
   getMenuItems(entity: Entity, context: MenuContext): ContextMenuItem[] {

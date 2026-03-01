@@ -6,6 +6,7 @@ import { CABINET_CATALOG } from '@/data/cabinetCatalog';
 import { createCabinetMesh } from '@/entities/createCabinetMesh';
 import { World } from '@/core/World';
 import { AssetLoader } from '@/rendering/AssetLoader';
+import { Wallet } from '@/core/Wallet';
 
 export class CabinetManager implements EntityManager {
   readonly entityType = 'cabinet';
@@ -13,11 +14,14 @@ export class CabinetManager implements EntityManager {
   constructor(
     private world: World,
     private loader: AssetLoader,
+    private wallet: Wallet,
   ) {}
 
   startPlacement(catalogId: string): void {
+    const definition = this.getDefinition(catalogId);
+    if (!this.wallet.canAfford(definition.cost)) return;
     const cabinet = this.add(catalogId, 0, 0);
-    this.world.startPlacement(cabinet);
+    this.world.startPlacement(cabinet, () => this.wallet.deduct(definition.cost));
   }
 
   add(catalogId: string, col: number, row: number, rotation?: THREE.Euler): Cabinet {
