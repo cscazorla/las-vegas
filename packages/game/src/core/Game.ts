@@ -40,15 +40,20 @@ export class Game {
     await this.loader.preload([...CABINET_MODEL_PATHS]);
 
     this.wallet = new Wallet();
-    this.world = new World(this.sceneManager.scene, this.loader, this.wallet, this.debug);
+    this.gameClock = new GameClock();
+    this.world = new World(
+      this.sceneManager.scene,
+      this.loader,
+      this.wallet,
+      this.gameClock,
+      this.debug,
+    );
 
     this.interaction = new InteractionManager(
       this.sceneManager.camera,
       this.sceneManager.renderer.domElement,
       this.world,
     );
-
-    this.gameClock = new GameClock();
     this.timeDisplay = new TimeDisplay(this.gameClock, {
       onSpeedChange: (speed) => this.gameClock.setSpeed(speed),
     });

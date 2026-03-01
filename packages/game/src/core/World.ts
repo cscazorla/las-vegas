@@ -5,6 +5,7 @@ import { Grid } from '@/core/Grid';
 import { CabinetManager } from '@/entities/CabinetManager';
 import { AssetLoader } from '@/rendering/AssetLoader';
 import { Wallet } from '@/core/Wallet';
+import { GameClock } from '@/core/GameClock';
 
 export class World {
   readonly grid: Grid;
@@ -18,10 +19,11 @@ export class World {
     private scene: THREE.Scene,
     private loader: AssetLoader,
     wallet: Wallet,
+    gameClock: GameClock,
     private debug = false,
   ) {
     this.grid = new Grid({ width: 10, depth: 10, cellSize: 1 });
-    this.cabinets = new CabinetManager(this, this.loader, wallet);
+    this.cabinets = new CabinetManager(this, this.loader, wallet, gameClock);
     this.registerManager(this.cabinets);
 
     if (this.debug) {
@@ -96,6 +98,7 @@ export class World {
   }
 
   dispose(): void {
+    this.cabinets.dispose();
     for (const entity of this.entities.values()) {
       this.scene.remove(entity.object3D);
     }

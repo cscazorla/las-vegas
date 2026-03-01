@@ -71,6 +71,14 @@ The game has a time system with speed controls:
 - **Speed controls:** 1x, 2x, 3x, and Pause (top-center HUD bar)
 - Pausing freezes game time only — camera and interaction remain responsive
 
+## Cabinet Health
+
+Each arcade cabinet has a condition value (0-100%) that degrades over time:
+
+- **Degradation:** Condition decreases each game hour (~5 game-days from 100% to 0%)
+- **Out of Order:** At 30% or below, the cabinet gets a red visual tint and is out of order
+- **Repair:** Right-click a cabinet → "Repair ($X)" to restore condition to 100%. Cost scales with damage — full `maintenanceCost` at 0%, half at 50%, free at 100%
+
 ## Assets
 
 3D models from [Mini Arcade](https://kenney.nl/assets/mini-arcade) by [Kenney](https://kenney.nl) (CC0 1.0).

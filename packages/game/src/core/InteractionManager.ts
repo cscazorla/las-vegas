@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { World } from '@/core/World';
 import type { Entity } from '@/entities/types';
 import { ContextMenu } from '@/ui/ContextMenu';
+import { HealthBar } from '@/ui/HealthBar';
 import { RotationToolbar } from '@/ui/RotationToolbar';
 
 const CLICK_THRESHOLD = 5; // px — max distance between pointerdown/up to count as click
@@ -18,6 +19,7 @@ export class InteractionManager {
   private selectedEntity: Entity | null = null;
   private pointerDownPos: { x: number; y: number } | null = null;
   private contextMenu: ContextMenu;
+  private healthBar: HealthBar;
 
   private floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   private moveState: { entity: Entity; originalPos: THREE.Vector3 } | null = null;
@@ -31,6 +33,7 @@ export class InteractionManager {
     private world: World,
   ) {
     this.contextMenu = new ContextMenu();
+    this.healthBar = new HealthBar();
     this.rotationToolbar = new RotationToolbar({
       onRotateCCW: () => this.rotateActive(-Math.PI / 2),
       onRotateCW: () => this.rotateActive(Math.PI / 2),
@@ -114,9 +117,17 @@ export class InteractionManager {
       this.hoveredEntity = hitEntity;
     }
 
-    // Track context menu to selected entity each frame
-    if (this.selectedEntity && this.contextMenu.visible) {
-      this.contextMenu.updatePosition(this.projectToScreen(this.selectedEntity.object3D.position));
+    // Track context menu and health bar to selected entity each frame
+    if (this.selectedEntity) {
+      const screenPos = this.projectToScreen(this.selectedEntity.object3D.position);
+      if (this.contextMenu.visible) {
+        this.contextMenu.updatePosition(screenPos);
+      }
+      if (this.healthBar.visible) {
+        const condition = this.selectedEntity.object3D.userData.condition as number | undefined;
+        if (condition != null) this.healthBar.show(condition);
+        this.healthBar.updatePosition({ x: screenPos.x, y: screenPos.y - 40 });
+      }
     }
   }
 
@@ -135,6 +146,7 @@ export class InteractionManager {
     this.placementState = null;
     this.rotationState = null;
     this.contextMenu.dispose();
+    this.healthBar.dispose();
     this.rotationToolbar.dispose();
   }
 
@@ -193,6 +205,7 @@ export class InteractionManager {
           removeHighlight(this.selectedEntity.object3D);
         }
         this.contextMenu.hide();
+        this.healthBar.hide();
 
         // Select new
         this.selectedEntity = this.hoveredEntity;
@@ -201,17 +214,28 @@ export class InteractionManager {
           startMove: (entity: Entity) => this.enterMoveMode(entity),
           startRotation: (entity: Entity) => this.enterRotationMode(entity),
         };
-        const items = this.world.getMenuItems(this.selectedEntity, menuContext).map((item) => ({
+        const target = this.selectedEntity;
+        const items = this.world.getMenuItems(target, menuContext).map((item) => ({
           ...item,
           action: item.action
             ? () => {
+                removeHighlight(target.object3D);
                 this.selectedEntity = null;
                 this.hoveredEntity = null;
+                this.healthBar.hide();
                 item.action!();
               }
             : undefined,
         }));
-        this.contextMenu.show(this.projectToScreen(this.selectedEntity.object3D.position), items);
+        const screenPos = this.projectToScreen(this.selectedEntity.object3D.position);
+        this.contextMenu.show(screenPos, items);
+
+        // Show health bar if entity has condition data
+        const condition = this.selectedEntity.object3D.userData.condition as number | undefined;
+        if (condition != null) {
+          this.healthBar.show(condition);
+          this.healthBar.updatePosition({ x: screenPos.x, y: screenPos.y - 40 });
+        }
       }
       // Clicking the already-selected entity does nothing
     } else {
@@ -221,6 +245,7 @@ export class InteractionManager {
         this.selectedEntity = null;
       }
       this.contextMenu.hide();
+      this.healthBar.hide();
     }
   };
 
@@ -228,6 +253,7 @@ export class InteractionManager {
     this.cancelActiveMode();
     this.placementState = { entity, onConfirm };
     this.contextMenu.hide();
+    this.healthBar.hide();
     removeHighlight(entity.object3D);
     this.selectedEntity = null;
     this.hoveredEntity = null;
@@ -239,6 +265,7 @@ export class InteractionManager {
       originalPos: entity.object3D.position.clone(),
     };
     this.contextMenu.hide();
+    this.healthBar.hide();
     removeHighlight(entity.object3D);
     this.selectedEntity = null;
     this.hoveredEntity = null;
@@ -251,6 +278,7 @@ export class InteractionManager {
       originalRotationY: entity.object3D.rotation.y,
     };
     this.contextMenu.hide();
+    this.healthBar.hide();
     removeHighlight(entity.object3D);
     this.selectedEntity = null;
     this.hoveredEntity = null;
@@ -341,16 +369,24 @@ function applyHighlight(object3D: THREE.Object3D, type: 'hover' | 'select'): voi
 }
 
 function removeHighlight(object3D: THREE.Object3D): void {
+  const isOutOfOrder = object3D.userData.outOfOrder === true;
+
   object3D.traverse((child) => {
     if (!(child instanceof THREE.Mesh)) return;
     const mat = child.material as THREE.MeshStandardMaterial;
     if (!mat.emissive) return;
 
     if (child.userData.originalEmissive != null) {
-      mat.emissive.setHex(child.userData.originalEmissive as number);
-      mat.emissiveIntensity = child.userData.originalEmissiveIntensity as number;
-      delete child.userData.originalEmissive;
-      delete child.userData.originalEmissiveIntensity;
+      if (isOutOfOrder) {
+        // Restore to out-of-order tint, keep originals for eventual repair
+        mat.emissive.setHex(object3D.userData.outOfOrderEmissiveHex as number);
+        mat.emissiveIntensity = object3D.userData.outOfOrderEmissiveIntensity as number;
+      } else {
+        mat.emissive.setHex(child.userData.originalEmissive as number);
+        mat.emissiveIntensity = child.userData.originalEmissiveIntensity as number;
+        delete child.userData.originalEmissive;
+        delete child.userData.originalEmissiveIntensity;
+      }
     }
   });
 }
