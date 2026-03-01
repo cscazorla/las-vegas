@@ -3,7 +3,9 @@ import { SceneManager } from '@/rendering/SceneManager';
 import { AssetLoader } from '@/rendering/AssetLoader';
 import { World } from '@/core/World';
 import { InteractionManager } from '@/core/InteractionManager';
+import { GameClock } from '@/core/GameClock';
 import { SideMenu } from '@/ui/SideMenu';
+import { TimeDisplay } from '@/ui/TimeDisplay';
 import { CabinetPanel } from '@/ui/CabinetPanel';
 import { CABINET_CATALOG, CABINET_MODEL_PATHS } from '@/data/cabinetCatalog';
 
@@ -18,6 +20,8 @@ export class Game {
   private loader: AssetLoader;
   private world!: World;
   private interaction!: InteractionManager;
+  private gameClock!: GameClock;
+  private timeDisplay!: TimeDisplay;
   private sideMenu!: SideMenu;
   private animationFrameId: number | null = null;
 
@@ -38,6 +42,11 @@ export class Game {
       this.sceneManager.renderer.domElement,
       this.world,
     );
+
+    this.gameClock = new GameClock();
+    this.timeDisplay = new TimeDisplay(this.gameClock, {
+      onSpeedChange: (speed) => this.gameClock.setSpeed(speed),
+    });
 
     const cabinetPanel = new CabinetPanel(CABINET_CATALOG, {
       onSelect: (catalogId) => this.world.cabinets.startPlacement(catalogId),
@@ -65,7 +74,9 @@ export class Game {
     this.sceneManager.render();
   };
 
-  private update(_delta: number): void {
+  private update(delta: number): void {
+    this.gameClock.update(delta);
+    this.timeDisplay.update(this.gameClock.time);
     this.interaction.update();
   }
 
@@ -84,6 +95,8 @@ export class Game {
 
   dispose(): void {
     this.stop();
+    this.timeDisplay.dispose();
+    this.gameClock.dispose();
     this.sideMenu.dispose();
     this.interaction.dispose();
     this.world.dispose();

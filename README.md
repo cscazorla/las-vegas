@@ -52,15 +52,24 @@ cp packages/game/.env.example packages/game/.env.local
 packages/
   game/          # Main game package (@las-vegas/game)
     src/
-      core/      # Game loop, World (entity container), Grid, InteractionManager
+      core/      # Game loop, World (entity container), Grid, InteractionManager, GameClock
       data/      # Static catalogs (cabinet definitions)
       entities/  # Entity types, mesh factories, and managers (e.g. CabinetManager)
       rendering/ # Scene, camera, renderer, lights, asset loading
-      ui/        # HTML overlays — SideMenu, CabinetPanel, ContextMenu
+      ui/        # HTML overlays — SideMenu, CabinetPanel, ContextMenu, TimeDisplay
     public/
       models/    # 3D GLB models + Textures/colormap.png
       textures/  # Alternate color palettes (variation-a, variation-b)
 ```
+
+## Game Time
+
+The game has a time system with speed controls:
+
+- **Time conversion:** 1 real second = 2 game minutes at 1x speed
+- **Start time:** Day 1, 08:00
+- **Speed controls:** 1x, 2x, 3x, and Pause (top-center HUD bar)
+- Pausing freezes game time only — camera and interaction remain responsive
 
 ## Assets
 
