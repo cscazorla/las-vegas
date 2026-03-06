@@ -27,7 +27,7 @@ export class World {
     this.grid = new Grid({ width: 10, depth: 10, cellSize: 1 });
     this.cabinets = new CabinetManager(this, this.loader, wallet, gameClock);
     this.registerManager(this.cabinets);
-    this.customers = new CustomerManager(this, this.loader);
+    this.customers = new CustomerManager(this, this.loader, gameClock);
     this.registerManager(this.customers);
 
     if (this.debug) {

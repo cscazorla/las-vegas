@@ -98,6 +98,7 @@ export class Game {
   private update(delta: number): void {
     this.gameClock.update(delta);
     this.timeDisplay.update(this.gameClock.time);
+    this.world.customers.update(delta);
     this.interaction.update();
   }
 
