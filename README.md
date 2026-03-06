@@ -79,6 +79,17 @@ Each arcade cabinet has a condition value (0-100%) that degrades over time:
 - **Out of Order:** At 30% or below, the cabinet gets a red visual tint and is out of order
 - **Repair:** Right-click a cabinet → "Repair ($X)" to restore condition to 100%. Cost scales with damage — full `maintenanceCost` at 0%, half at 50%, free at 100%
 
+## Customers
+
+Customers spawn on the grid and roam the arcade autonomously:
+
+- **Walking:** Customers move cell-by-cell at 1.2 cells/sec (scaled by game speed), picking random neighboring cells while avoiding obstacles
+- **Idle pauses:** 20% chance to stop and idle for 1-3 seconds between moves
+- **Animations:** Idle and walk animations crossfade smoothly (0.2s blend)
+- **Texture variation:** Each customer spawns with a random color palette
+- **HUD counter:** Top-right display shows current customer count
+- Pausing the game freezes customer movement but not the camera
+
 ## Assets
 
 3D models from [Mini Arcade](https://kenney.nl/assets/mini-arcade) by [Kenney](https://kenney.nl) (CC0 1.0).
