@@ -3,6 +3,7 @@ import type { Entity, EntityManager, MenuContext, CellPosition } from '@/entitie
 import type { ContextMenuItem } from '@/ui/ContextMenu';
 import { Grid } from '@/core/Grid';
 import { CabinetManager } from '@/entities/CabinetManager';
+import { CustomerManager } from '@/entities/CustomerManager';
 import { AssetLoader } from '@/rendering/AssetLoader';
 import { Wallet } from '@/core/Wallet';
 import { GameClock } from '@/core/GameClock';
@@ -10,6 +11,7 @@ import { GameClock } from '@/core/GameClock';
 export class World {
   readonly grid: Grid;
   readonly cabinets: CabinetManager;
+  readonly customers: CustomerManager;
   private entities = new Map<number, Entity>();
   private managers = new Map<string, EntityManager>();
   private nextId = 1;
@@ -25,6 +27,8 @@ export class World {
     this.grid = new Grid({ width: 10, depth: 10, cellSize: 1 });
     this.cabinets = new CabinetManager(this, this.loader, wallet, gameClock);
     this.registerManager(this.cabinets);
+    this.customers = new CustomerManager(this, this.loader);
+    this.registerManager(this.customers);
 
     if (this.debug) {
       this.scene.add(this.grid.createHelper());
@@ -99,6 +103,7 @@ export class World {
 
   dispose(): void {
     this.cabinets.dispose();
+    this.customers.dispose();
     for (const entity of this.entities.values()) {
       this.scene.remove(entity.object3D);
     }

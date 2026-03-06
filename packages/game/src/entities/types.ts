@@ -19,6 +19,10 @@ export interface Cabinet extends Entity {
   readonly catalogId: string;
 }
 
+export interface Customer extends Entity {
+  readonly type: 'customer';
+}
+
 export interface MenuContext {
   startMove: (entity: Entity) => void;
   startRotation: (entity: Entity) => void;

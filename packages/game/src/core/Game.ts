@@ -8,8 +8,10 @@ import { Wallet } from '@/core/Wallet';
 import { SideMenu } from '@/ui/SideMenu';
 import { TimeDisplay } from '@/ui/TimeDisplay';
 import { MoneyDisplay } from '@/ui/MoneyDisplay';
+import { CustomerCountDisplay } from '@/ui/CustomerCountDisplay';
 import { CabinetPanel } from '@/ui/CabinetPanel';
 import { CABINET_CATALOG, CABINET_MODEL_PATHS } from '@/data/cabinetCatalog';
+import { CUSTOMER_MODEL_PATH, CUSTOMER_TEXTURE_PATHS } from '@/entities/createCustomerMesh';
 
 export interface GameOptions {
   debug?: boolean;
@@ -26,6 +28,7 @@ export class Game {
   private gameClock!: GameClock;
   private timeDisplay!: TimeDisplay;
   private moneyDisplay!: MoneyDisplay;
+  private customerCountDisplay!: CustomerCountDisplay;
   private sideMenu!: SideMenu;
   private animationFrameId: number | null = null;
 
@@ -37,7 +40,8 @@ export class Game {
   }
 
   async load(): Promise<void> {
-    await this.loader.preload([...CABINET_MODEL_PATHS]);
+    await this.loader.preload([...CABINET_MODEL_PATHS, CUSTOMER_MODEL_PATH]);
+    await this.loader.preloadTextures(CUSTOMER_TEXTURE_PATHS);
 
     this.wallet = new Wallet();
     this.gameClock = new GameClock();
@@ -58,6 +62,7 @@ export class Game {
       onSpeedChange: (speed) => this.gameClock.setSpeed(speed),
     });
     this.moneyDisplay = new MoneyDisplay(this.wallet);
+    this.customerCountDisplay = new CustomerCountDisplay(this.world.customers);
 
     const cabinetPanel = new CabinetPanel(CABINET_CATALOG, {
       onSelect: (catalogId) => this.world.cabinets.startPlacement(catalogId),
@@ -70,6 +75,11 @@ export class Game {
     this.world.cabinets.add('pac-man', -1, 0);
     this.world.cabinets.add('space-invaders', 0, -1, new THREE.Euler(0, Math.PI, 0));
     this.world.cabinets.add('donkey-kong', -1, -1, new THREE.Euler(0, -Math.PI, 0));
+
+    // Demo customers for visual verification
+    this.world.customers.spawn(2, 0);
+    this.world.customers.spawn(3, -3);
+    this.world.customers.spawn(-2, 2);
   }
 
   start(): void {
@@ -106,6 +116,7 @@ export class Game {
 
   dispose(): void {
     this.stop();
+    this.customerCountDisplay.dispose();
     this.moneyDisplay.dispose();
     this.timeDisplay.dispose();
     this.gameClock.dispose();

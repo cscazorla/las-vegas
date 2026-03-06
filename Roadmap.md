@@ -23,5 +23,6 @@
 
 # Links
 
+- Warcraft III Web UI (npm) https://wc3ui.banteg.xyz/
 - https://kenney.nl/assets/mini-arcade
 - https://store.steampowered.com/app/3299460/Arcade_Empire_Tycoon/
